@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huizhixin.integrated.mapper.EmployeeUserMapper">
+
+    <select id="getUserByJobId" parameterType="java.lang.String" resultType="com.huizhixin.integrated.entity.User">
+    SELECT * FROM base_user t1 where t1.jobNumber=#{accountName}
+    </select>
+
+    <select id="geyDictgroupList" parameterType="java.lang.String" resultType="com.huizhixin.integrated.entity.result.DictItemBean">
+    select t2.id,t2.item_text,t2.item_value,t2.description from sys_dict_item t2 where t2.dict_id in(SELECT t1.id FROM sys_dict t1 where t1.dict_code=#{dictname})
+    </select>
+
+    <update id="saveDictgroupList" parameterType="com.huizhixin.integrated.entity.result.DictItemBean" >
+    update sys_dict_item set item_value=#{itemValue} where id=#{id}
+    </update>
+
+</mapper>
+
+

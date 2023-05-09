@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huizhixin.integrated.mapper.AttendConfigMapper">
+    <select id="getUserCardConfigList" resultType="com.huizhixin.integrated.entity.result.AttendConfigUserBen">
+    SELECT t3.depart_name, t1.id,t1.username,t1.realname,t1.attend_type FROM sys_user t1 left join sys_user_depart t2
+    on t1.id=t2.user_id left join sys_depart t3 on t3.id=t2.dep_id group by t1.id
+    </select>
+
+    <select id="getUserCardConfigTotal" resultType="java.lang.Integer">
+    select count(*) a from (SELECT t3.depart_name, t1.id,t1.username,t1.realname,t1.attend_type FROM sys_user t1 left join sys_user_depart t2 on t1.id=t2.user_id
+    left join sys_depart t3 on t3.id=t2.dep_id group by t1.id
+    ) t
+    </select>
+
+    <select id="editUserCardConfig">
+    update sys_user set attend_type='${attendType}' where id='${id}'
+    </select>
+
+    <select id="getAttendConfList" resultType="com.huizhixin.integrated.entity.AttendLateTimConf">
+        select id,item_text,item_value,description from sys_dict_item t2 where t2.dict_id in(SELECT id FROM sys_dict t1 where t1.dict_code=#{code})
+    </select>
+
+    <update id="updateAttendConf">
+        update sys_dict_item set  id=#{id},item_text=#{itemText},item_value=#{itemValue}  where id=#{id}
+    </update>
+
+</mapper>

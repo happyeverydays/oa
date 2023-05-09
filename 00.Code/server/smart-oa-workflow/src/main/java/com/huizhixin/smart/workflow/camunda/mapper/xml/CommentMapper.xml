@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.huizhixin.smart.workflow.camunda.mapper.CommentMapper">
+  
+  <!-- COMMENT INSERT -->
+  <!-- wushuo 扩展 -->
+  <insert id="insertCommentExt" parameterType="com.huizhixin.smart.workflow.camunda.entity.CommentExtEntity">
+    insert into ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_,USER_NAME, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_
+    ,APPROVAL_RESULT_CODE,APPROVAL_RESULT_DESC,TASK_KEY,TASK_NAME
+    )
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{type ,jdbcType=VARCHAR},
+      #{time ,jdbcType=TIMESTAMP},
+      #{userId ,jdbcType=VARCHAR},
+      #{userName ,jdbcType=VARCHAR},
+      #{taskId ,jdbcType=VARCHAR},
+      #{rootProcessInstanceId ,jdbcType=VARCHAR},
+      #{processInstanceId ,jdbcType=VARCHAR},
+      #{action ,jdbcType=VARCHAR},
+      #{message ,jdbcType=VARCHAR},
+      #{fullMessageBytes ,jdbcType=BLOB},
+      #{tenantId ,jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP},
+      #{approvalResultCode,jdbcType=VARCHAR},
+      #{approvalResultDesc,jdbcType=VARCHAR},
+      #{taskKey,jdbcType=VARCHAR},
+      #{taskName,jdbcType=VARCHAR}
+      
+    )
+  </insert>
+  
+  <!-- COMMENT RESULTMAP -->
+
+  <resultMap id="commentResultMap" type="com.huizhixin.smart.workflow.camunda.entity.CommentExtEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="time" column="TIME_" jdbcType="TIMESTAMP" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="action" column="ACTION_" jdbcType="VARCHAR" />
+    <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
+    <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BLOB" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    
+    <result property="taskName" column="TASK_NAME" jdbcType="VARCHAR"/>
+    <result property="userName" column="USER_NAME" jdbcType="VARCHAR"/>
+    <result property="approvalResultCode" column="APPROVAL_RESULT_CODE" jdbcType="VARCHAR"/>
+    <result property="approvalResultDesc" column="APPROVAL_RESULT_DESC" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <!-- COMMENT SELECT -->
+  <select id="selectCommentsByProcessInstanceId" resultMap="commentResultMap">
+    select * 
+    from ACT_HI_COMMENT 
+    where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}
+    order by TIME_ desc
+  </select>
+</mapper>

@@ -1,0 +1,15 @@
+----------
+ 更新历史
+----------
+
+--(2020-06-18 )
+1、EntryFactory.js、TabSelectFactory.js 放于\homePage\node_modules\bpmn-js-properties-panel\lib\factory\路径下
+2、UserTaskProps.js 放于\homePage\node_modules\bpmn-js-properties-panel\lib\provider\camunda\parts\路径下
+
+
+--(2020-06-8 )
+1、JobPriority.js放于\node_modules\bpmn-js-properties-panel\lib\provider\camunda\parts\implementation
+2、TextInputEntryFactory.js 放于\node_modules\bpmn-js-properties-panel\lib\factory\
+3、building.vue 放于 \src\views\workflow\design\
+4、UserSelectModal.vue 放于 \src\views\workflow\design\modules\
+5、api.js 中增加了获取工作流的人员选择APi ,文件位于\src\api\ 代码改动于 92行和140行代码

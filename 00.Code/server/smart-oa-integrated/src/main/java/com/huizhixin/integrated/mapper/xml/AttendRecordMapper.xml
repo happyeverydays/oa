@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huizhixin.integrated.mapper.AttendRecordMapper">
+    <select id="getDataByUserId" resultType="com.huizhixin.integrated.entity.AttendRecord">
+select t3.depart_name dept_name,t3.id dept_id,(SELECT realname FROM sys_user t1 where t1.id=#{userid}) username,(SELECT attend_type FROM sys_user t1 where t1.id=#{userid}) attend_type,(SELECT job_number FROM sys_user t1 where t1.id=#{userid}) job_number from sys_depart t3
+ where t3.id in(SELECT dep_id FROM oasys.sys_user_depart t2 where t2.user_id=#{userid}) limit 1
+</select>
+    <select id="getAttendStaticsList" resultType="com.huizhixin.integrated.entity.result.AttendStaticsBean">
+        select t4.userid,t4.job_number,t4.dept_name,t4.dept_id,t4.username,round(sum(ifnull(if(t4.mindtleave&gt;0,t4.mindtleave,0),0)),2) mindtarrivedt,sum(ifnull(if(t4.mindtleave&gt;0,1,0),0)) mindtarrivedays
+        ,round(sum(ifnull(if(t4.maxdtleave&gt;0,t4.maxdtleave,0),0)),2) maxdtleavedt,sum(ifnull(if(t4.maxdtleave&gt;0,1,0),0)) maxdtleavedays,
+        sum(t4.maxdtleave&lt;=0 and t4.mindtleave&lt;=0) acceptcard,sum(if(addhours1&gt;0,1,0)) adddays,round(sum(addhours1),2) addhours,sum(if(dakacs=1,1,0)) misscard from (
+        select t1.userid,t2.job_number,t1.dept_name,t1.dept_id,t1.username,min(t1.start_time) start_time,max(t1.start_time) end_time ,
+        (time_to_sec(date_format(min(t1.start_time),'%H:%i:%s')) -time_to_sec(t3.start_time))/3600 mindtleave,
+        (time_to_sec(t3.end_time)-time_to_sec(date_format(max(t1.start_time),'%H:%i:%s')))/3600 maxdtleave,
+        if(count(*)&gt;1 and time_to_sec(date_format(max(t1.start_time),'%H:%i:%s')) &gt;time_to_sec(t4.end_time)
+        and (length(t1.process_overtime_id)&gt;0 and t1.process_overtime_id is not null )
+        ,(time_to_sec(date_format(max(t1.start_time),'%H:%i:%s'))-time_to_sec(t4.start_time))/3600,0) addhours1,count(*) dakacs
+        from attend_record t1 left join sys_user t2 on t1.userid=t2.id
+        left join attend_config t3 on t3.id=4 left join attend_config t4 on t4.id=5
+        where 1=1
+        <if test="attendRecord.starttime !=null">
+            and t1.start_time &gt;='${attendRecord.starttime}'
+        </if>
+        <if test="attendRecord.endtime !=null">
+            and t1.start_time &lt;='${attendRecord.endtime} 23:59:59'
+        </if>
+        <if test="attendRecord.username !=null">
+            and t1.username like '%${attendRecord.username}%'
+        </if>
+        <if test="attendRecord.deptname !=null">
+            and t1.dept_name like '%${attendRecord.deptname}%'
+        </if>
+        group by t1.userid,date_format(t1.start_time,'%Y-%m-%d')
+        ) t4 group by t4.userid
+    </select>
+
+    <select id="getAttendStaticsTotal" resultType="java.lang.Integer">
+        select count(*) a from (
+        select t4.userid,t4.job_number,t4.dept_name,t4.dept_id,t4.username,round(sum(ifnull(if(t4.mindtleave&gt;0,t4.mindtleave,0),0)),2) mindtarrivedt,sum(ifnull(if(t4.mindtleave&gt;0,1,0),0)) mindtarrivedays
+        ,round(sum(ifnull(if(t4.maxdtleave&gt;0,t4.maxdtleave,0),0)),2) maxdtleavedt,sum(ifnull(if(t4.maxdtleave&gt;0,1,0),0)) maxdtleavedays,
+        sum(t4.maxdtleave&lt;=0 and t4.mindtleave&lt;=0) acceptcard,sum(if(addhours1&gt;0,1,0)) adddays,round(sum(addhours1),2) addhours,sum(if(dakacs=1,1,0)) misscard from (
+        select t1.userid,t2.job_number,t1.dept_name,t1.dept_id,t1.username,min(t1.start_time) start_time,max(t1.start_time) end_time ,
+        (time_to_sec(date_format(min(t1.start_time),'%H:%i:%s')) -time_to_sec(t3.start_time))/3600 mindtleave,
+        (time_to_sec(t3.end_time)-time_to_sec(date_format(max(t1.start_time),'%H:%i:%s')))/3600 maxdtleave,
+        if(count(*)&gt;1 and time_to_sec(date_format(max(t1.start_time),'%H:%i:%s')) &gt;time_to_sec(t4.end_time)
+        and (length(t1.process_overtime_id)&gt;0 and t1.process_overtime_id is not null )
+        ,(time_to_sec(date_format(max(t1.start_time),'%H:%i:%s'))-time_to_sec(t4.start_time))/3600,0) addhours1,count(*) dakacs
+        from attend_record t1 left join sys_user t2 on t1.userid=t2.id
+        left join attend_config t3 on t3.id=4 left join attend_config t4 on t4.id=5
+        where 1=1
+        <if test="attendRecord.starttime !=null">
+            and t1.start_time &gt;='${attendRecord.starttime}'
+        </if>
+        <if test="attendRecord.endtime !=null">
+            and t1.start_time &lt;='${attendRecord.endtime} 23:59:59'
+        </if>
+        <if test="attendRecord.username !=null">
+            and t1.username like '%${attendRecord.username}%'
+        </if>
+        <if test="attendRecord.deptname !=null">
+            and t1.dept_name like '%${attendRecord.deptname}%'
+        </if>
+        group by t1.userid,date_format(t1.start_time,'%Y-%m-%d')
+        ) t4 group by t4.userid)t
+    </select>
+</mapper>

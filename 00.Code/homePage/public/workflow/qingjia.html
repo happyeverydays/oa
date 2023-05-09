@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表单</title>
+    <!-- <link rel="stylesheet" type="text/css" href="../jquery-easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../jquery-easyui/themes/icon.css">
+	<script type="text/javascript" src="../jquery-easyui/jquery.min.js"></script>
+	<script type="text/javascript" src="../jquery-easyui/jquery.easyui.min.js"></script> -->
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <style>
+        * {
+            font-size: 14px;
+            color: #606266;
+
+        }
+
+        .MBtn {
+            width: 60px;
+            height: 30px;
+            background: #1890ff;
+            border-radius: 4px;
+            color: #fff;
+            border: none;
+
+        }
+
+        input {
+            border-radius: 4px;
+            width: 100%;
+            border-width: 1px;
+
+        }
+
+        #sex {
+            width: 100%;
+        }
+
+        .flexStart {
+            vertical-align: top;
+        }
+
+        table {
+            margin-bottom: 10px;
+        }
+
+        tr:not(:last-child)>td:first-child {
+            text-align-last: justify;
+        }
+
+        .valid,
+        .form-group input:valid,
+        .form-group textarea:valid {
+            border-color: #429032;
+            box-shadow: inset 5px 0 0 #429032;
+        }
+
+        .invalid,
+        .form-group input:invalid,
+        .form-group textarea:invalid {
+            border-color: #D61D1D;
+            box-shadow: inset 5px 0 0 #D61D1D;
+        }
+
+        #resons {
+            width: 100%;
+        }
+
+        /* .form-group {
+            width: 32rem;
+            padding: 1rem;
+            border: 1px solid transparent;
+        }
+
+        .form-group:hover {
+            border-color: #eee;
+            transition: border .2s;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: normal;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            display: block;
+            width: 100%;
+            line-height: 2rem;
+            padding: .5rem .5rem .5rem 1rem;
+            border: 1px solid #ccc;
+            outline: none;
+        } */
+    </style>
+</head>
+
+<form name="myForm">
+    <table align="left">
+        <tr class="form-group">
+            <td>请假人：</td>
+            <td>
+                <input type="text" name="loginName" required="required" />
+            </td>
+        </tr>
+        <tr class="form-group">
+            <td>请假事由：</td>
+            <td>
+                <input type="text" name="loginPwd" required="required" />
+            </td>
+        </tr>
+        <tr class="flexStart form-group">
+            <td>请假原因：</td>
+            <td>
+                <textarea name="resons" id="resons" cols="30" rows="10" required="required"></textarea>
+            </td>
+        </tr>
+        <tr class="form-group">
+            <td>性别：</td>
+            <td>
+                <select name="性别" id="sex">
+                    <option value="0">男</option>
+                    <option value="1">女</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>附件上传</td>
+            <td>
+                <input type="file" id="files">
+            </td>
+        </tr>
+        <!-- 以下是提交、取消按钮 -->
+        <tr>
+            <td colspan="2" style="text-align: center; padding: 5px;">
+                <button class="MBtn">提交</button>
+
+            </td>
+        </tr>
+
+    </table>
+
+</form>
+
+
+<script>
+    window.onload = () => {
+        //用户ID
+        let userId = window.location.href.split('?')[1].split('=')[1]
+        console.log(userId, '2333')
+    };
+    $('.MBtn').click(() => {
+        //验证数据
+        if (!myForm.loginName.value) {
+            alert("请输入请假人！");
+            myForm.loginName.focus();
+            return;
+        }
+
+        if (!myForm.loginPwd.value) {
+            alert("请输入请假原因！");
+            myForm.loginPwd.focus();
+            return;
+        }
+        if (!myForm.resons.value) {
+            alert("请输入请假原因！");
+            myForm.loginPwd.focus();
+            return;
+        }
+    })
+    $('#files').change((event) => {
+        console.log(event.target.files[0])
+        let file = event.target.files[0];
+        let img = new FormData();
+
+        img.append("file", file, file.name);
+        let rander = new FileReader();
+        rander.readAsDataURL(file);
+       console.log(img,rander)
+    })
+    //上传文件
+    function myfun(){
+        console.log('开始调用iframe里面的方法')
+        let objs={
+            userName:false,
+            resons_1:false,
+            resons_2:false,
+        }
+         //验证数据
+         if (!myForm.loginName.value) {
+            objs.userName=false
+        }else{
+            objs.userName=true
+        }
+
+        if (!myForm.loginPwd.value) {
+            objs.resons_1=false
+        }else{
+            objs.resons_1=true
+        }
+        if (!myForm.resons.value) {
+            objs.resons_2=false
+        }else{
+            objs.resons_2=true
+        }
+        parent.postMessage(objs,'http://localhost:3000/workflowmanage/mytask')
+    }
+    //提交
+    function submitFrom() {
+        // console.log(111)
+        //验证数据
+        if (!myForm.loginName.value) {
+            alert("请输入登录账户！");
+            myForm.loginName.focus();
+            return;
+        }
+
+        if (!myForm.loginPwd.value) {
+            alert("请输入登录密码！");
+            myForm.loginPwd.focus();
+            return;
+        }
+
+        //提交表单
+        myForm.method = 'POST';
+        myForm.action = "action.html";
+        myForm.submit();
+    }
+
+    //重置
+    function resetFrom() {
+        //重置表单
+        document.getElementsByName("myForm")[0].reset();
+    }
+</script>
+</body>
+
+</html>

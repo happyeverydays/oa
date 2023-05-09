@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="com.huizhixin.smart.workflow.camunda.mapper.ExecutionMapper">
+  <!-- EXECUTION RESULTMAP -->
+  <resultMap id="executionExtResultMap" type="com.huizhixin.smart.workflow.camunda.entity.ExecutionExt">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
+    <result property="isConcurrent" column="IS_CONCURRENT_" jdbcType="BOOLEAN" />
+    <result property="isScope" column="IS_SCOPE_" jdbcType="BOOLEAN" />
+    <result property="isEventScope" column="IS_EVENT_SCOPE_" jdbcType="BOOLEAN" />
+    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
+    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
+    <result property="superCaseExecutionId" column="SUPER_CASE_EXEC_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+    <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
+    <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <!--定制开发  -->
+   	<result property="name" column="NAME_" jdbcType="VARCHAR"/>
+	<result property="key" column="KEY_" jdbcType="VARCHAR"/>
+	<result property="startTime" column="START_TIME_" jdbcType="VARCHAR"/>
+	<result property="endTime" column="END_TIME_" jdbcType="VARCHAR"/> 
+	<result property="duration" column="DURATION_" jdbcType="VARCHAR"/>
+	<result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR"/>
+	<result property="startActId" column="START_ACT_ID_" jdbcType="VARCHAR"/> 
+	<result property="endActId" column="END_ACT_ID_" jdbcType="VARCHAR"/> 
+	<result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR"/>
+	<result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>
+    <result property="startUserName" column="START_USER_NAME_" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  
+  <!-- EXECUTION UPDATE -->
+  	<update id="updateExecutiondById"
+		parameterType="com.huizhixin.smart.workflow.camunda.entity.ExecutionExt">
+		update ACT_RU_EXECUTION set
+		DESCRIPTION = #{description, jdbcType=BIGINT}
+		where ID_ = #{id, jdbcType=VARCHAR}
+	</update>
+	
+  <!-- EXECUTION SELECT --> 
+    <select id="selectProcessInstanceByQueryCriteria" resultMap="executionExtResultMap">
+    select  RES.*,
+    P.NAME_,
+    P.KEY_,
+	HP.START_TIME_,
+	HP.END_TIME_, 
+	HP.DURATION_,
+	HP.START_USER_ID_,
+	HP.START_ACT_ID_, 
+	HP.END_ACT_ID_, 
+	HP.SUPER_PROCESS_INSTANCE_ID_,
+	HP.DELETE_REASON_,
+    concat(U.FIRST_ ,U.LAST_) as START_USER_NAME_
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+  </select>
+  
+  <select id="selectProcessInstanceCountByQueryCriteria" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+  </select>
+  
+    <sql id="selectProcessInstanceByQueryCriteriaSql">
+    from ACT_RU_EXECUTION RES
+    inner join ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+    inner join ACT_HI_PROCINST HP ON HP.PROC_INST_ID_ = RES.PROC_INST_ID_
+	left join ACT_ID_USER U on U.ID_=HP.START_USER_ID_
+    <where>
+      RES.PARENT_ID_ is null
+      <if test="processInstanceQuery.processDefinitionId != null">
+        and P.ID_ = #{processInstanceQuery.processDefinitionId}
+      </if>
+      <if test="processInstanceQuery.processDefinitionKey != null">
+        and P.KEY_ = #{processInstanceQuery.processDefinitionKey}
+      </if>
+      <if test="processInstanceQuery.deploymentId != null">
+        and P.DEPLOYMENT_ID_ = #{processInstanceQuery.deploymentId}
+      </if>
+      <if test="processInstanceQuery.processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceQuery.processInstanceId}
+      </if>
+      <if test="processInstanceQuery.processInstanceIds != null and !processInstanceQuery.processInstanceIds.isEmpty()">
+        and
+        <bind name="listOfIds" value="processInstanceQuery.processInstanceIds" />
+        <bind name="fieldName" value="'RES.PROC_INST_ID_'" />
+        <include refid="com.huizhixin.smart.workflow.camunda.mapper.CommonsMapper.applyInForPaginatedCollection" />
+      </if>
+      <if test="processInstanceQuery.businessKey != null">
+        and RES.BUSINESS_KEY_ = #{processInstanceQuery.businessKey}
+      </if>
+      <if test="processInstanceQuery.businessKeyLike != null">
+        and RES.BUSINESS_KEY_ like #{processInstanceQuery.businessKeyLike}
+      </if>
+      <if test="processInstanceQuery.titleLike != null">
+        and HP.DESCRIPTION like  CONCAT('%title":"',#{processInstanceQuery.titleLike},'%') 
+      </if>
+      
+    </where>
+  </sql>
+  
+</mapper>

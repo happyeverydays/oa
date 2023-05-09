@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huizhixin.integrated.mapper.MeasureHistoryMapper">
+    <select id="getElectricTotal" resultType="java.lang.Double">
+    SELECT  ifnull(max(t1.point_value+0) - min(t1.point_value+0),0) a FROM device_measure_history t1 where
+    t1.measure_dt &gt;='${dt}' and t1.measure_dt &lt;date_add(convert('${dt}' , datetime),INTERVAL 2 hour ) and t1.point_no='${deviceno}'
+</select>
+    <select id="getcostelectrictodayTotal" resultType="java.lang.Double">
+SELECT  ifnull(max(t1.point_value+0) - min(t1.point_value+0),0) a FROM device_measure_history t1 where
+    t1.measure_dt &gt;='${dt}' and t1.measure_dt &lt;date_add(convert('${dt}' , datetime),INTERVAL 24 hour ) and t1.point_no='${deviceno}'
+    </select>
+</mapper>

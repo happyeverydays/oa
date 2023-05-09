@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.huizhixin.smart.workflow.camunda.mapper.ProcessUserMapper">
+
+<select id="getProcessUserList" resultType="com.huizhixin.smart.workflow.camunda.entity.ProcessUser">
+ select id,username code,concat(realname,ifnull(depart,'')) name from sys_user t1 left join (select concat(' (',group_concat( t2.depart_name),')') depart,t1.user_id from sys_user_depart t1 left join sys_depart t2 on t1.dep_id=t2.id group by t1.user_id
+  ) t2 on t1.id=t2.user_id order by CONVERT(realname USING gbk)
+</select>
+
+<select id="getProcessGroupList" resultType="com.huizhixin.smart.workflow.camunda.entity.ProcessUser">
+ select `id` `id`,`role_code` `code`,`role_name` `name` from sys_role  order by CONVERT(`role_name` USING gbk)
+</select>
+
+<select id="getProcessDepartList" resultType="com.huizhixin.smart.workflow.camunda.entity.ProcessUser">
+ select id,role_code code,role_name name from sys_role order by CONVERT(role_name USING gbk)
+</select>
+
+<select id="getUserIds" resultType="java.lang.String">
+	select distinct ur.user_id  from sys_user_role ur    
+	inner join sys_user_depart ud on ud.user_id = ur.user_id  
+	where 1=1 
+      <if test="departIdList != null &amp;&amp; departIdList.size > 0">
+       and ud.dep_id in
+        <foreach item="departId" index="index" collection="departIdList"  open="(" separator="," close=")">
+          #{departId}
+        </foreach>
+      </if>
+      <if test="roleIdList != null &amp;&amp; roleIdList.size > 0">
+       and ur.role_id in
+        <foreach item="roleId" index="index" collection="roleIdList" open="(" separator="," close=")">
+          #{roleId}
+        </foreach>
+      </if>
+</select>
+
+
+</mapper>
